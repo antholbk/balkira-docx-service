@@ -1,0 +1,18 @@
+{
+  "name": "balkira-docx-service",
+  "version": "1.0.0",
+  "description": "Microservice Node.js pour génération de fichiers .docx Word à partir de Markdown — Balkira GxP Doc Companion",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "docx": "^9.0.2",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
