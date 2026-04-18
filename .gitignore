@@ -1,3 +1,7 @@
 node_modules/
-*.docx
 *.log
+# Generated/test docx files (not templates)
+test_*.docx
+webhook_*.docx
+validate_others.js
+test_result.json
