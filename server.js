@@ -56,6 +56,7 @@ function raRaw(xml, search, replacement) {
 }
 
 // Checkbox: mark selected option(s) with ☑, keep others as ☐
+// Uses global replace — only suitable when each option appears exactly once in the doc
 function checkboxes(xml, options, selected) {
   if (!selected) return xml;
   const sel = String(selected).toLowerCase();
@@ -64,6 +65,19 @@ function checkboxes(xml, options, selected) {
     xml = xml.split('☐ ' + opt).join(mark + opt);
   }
   return xml;
+}
+
+// OUI/NON binary pair: replaces the FIRST occurrence of "☐ OUI  ☐ NON" only.
+// Use this for table rows where the same ☐ OUI  ☐ NON pattern repeats per row.
+// value: true/"OUI"/"oui" → ☑ OUI  ☐ NON
+//        false/"NON"/"non" or anything else → ☐ OUI  ☑ NON
+function checkboxOuiNon(xml, value) {
+  const isOui = value === true || String(value).toUpperCase().trim() === 'OUI';
+  const pattern = '☐ OUI  ☐ NON';
+  const replacement = isOui ? '☑ OUI  ☐ NON' : '☐ OUI  ☑ NON';
+  const idx = xml.indexOf(pattern);
+  if (idx === -1) return xml;
+  return xml.substring(0, idx) + replacement + xml.substring(idx + pattern.length);
 }
 
 // ── MISTRAL CONTENT PARSER ───────────────────────────────────
@@ -412,23 +426,29 @@ function applyDiraPDFM(xml, fd, m, requestId) {
   xml = checkboxes(xml, ['Critical', 'Major'], sys2crit);
   xml = rf(xml, '&lt;À compléter&gt;', safeGet(systems, 2, 'process') || '');
 
-  // Actors — mark all OUI
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');  // System Owner PDFM
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');  // System Owner DIRA
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');  // System Owner DIRA mitigé
-  xml = rf(xml, '&lt;Nom Prénom&gt;', fd.system_owner || fd.assigned_to || '');
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');
-  xml = rf(xml, '&lt;Nom Prénom&gt;', fd.process_owner || fd.assigned_to || '');
-  xml = checkboxes(xml, ['OUI', 'NON'], 'NON');
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');
-  xml = rf(xml, '&lt;Nom Prénom&gt;', fd.quality_manager || '');
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');
-  xml = checkboxes(xml, ['OUI', 'NON'], 'OUI');
-  xml = rf(xml, '&lt;Nom Prénom&gt;', fd.it_lead || fd.assigned_to || '');
+  // Actors — use checkboxOuiNon (replaces FIRST occurrence only, one cell at a time)
+  // Template layout per actor row: [PDFM cell] [DIRA cell] [DIRA mitigé cell] [Nom cell]
+  // Defaults from template: System Owner OUI/OUI/OUI, Process Owner OUI/OUI/OUI,
+  //                         Quality Manager NON/OUI/OUI, IT Lead OUI/OUI/OUI
+  const actors = Array.isArray(m.actors) ? m.actors : [];
+  const defaultActors = [
+    { pdfm: true,  dira: true,  dira_mitigated: true,  name: fd.system_owner || fd.assigned_to || '' },
+    { pdfm: true,  dira: true,  dira_mitigated: true,  name: fd.process_owner || fd.assigned_to || '' },
+    { pdfm: false, dira: true,  dira_mitigated: true,  name: fd.quality_manager || '' },
+    { pdfm: true,  dira: true,  dira_mitigated: true,  name: fd.it_lead || fd.assigned_to || '' }
+  ];
+  const actorData = defaultActors.map((def, i) => ({
+    pdfm: actors[i] ? actors[i].pdfm : def.pdfm,
+    dira: actors[i] ? actors[i].dira : def.dira,
+    dira_mitigated: actors[i] ? actors[i].dira_mitigated : def.dira_mitigated,
+    name: actors[i] ? (actors[i].name || def.name) : def.name
+  }));
+  for (const actor of actorData) {
+    xml = checkboxOuiNon(xml, actor.pdfm);
+    xml = checkboxOuiNon(xml, actor.dira);
+    xml = checkboxOuiNon(xml, actor.dira_mitigated);
+    xml = rf(xml, '&lt;Nom Prénom&gt;', actor.name);
+  }
 
   // Extra actor row
   xml = rf(xml, '&lt;À compléter&gt;', '');
