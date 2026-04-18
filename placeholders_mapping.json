@@ -1,0 +1,322 @@
+{
+  "_comment": "Mapping des placeholders templates BALKIRA GxP. Les clés sont les chaînes exactes dans le XML Word (avec entités HTML &lt; &gt;).",
+
+  "anomaly_form_v1": {
+    "doc_ref_pattern": "Référence : BLK-ANO-XXXX",
+    "doc_ref_value": "Référence : {form_data.veeva_ref || 'BLK-ANO-' + request_id}",
+
+    "simple_replacements": {
+      "BALKIRA-ANO-&lt;XXXX&gt;  [Généré par Veeva Vault]": "form_data.veeva_ref",
+      "&lt;Ex: PAS-X MES, Veeva Vault, iLearn LMS&gt;": "form_data.application_component",
+      "&lt;Ex: v3.2.1&gt;": "form_data.component_version",
+      "&lt;Ex: TC-UAT-045 / Run 3 / Step 7&gt;": "form_data.test_case_ref",
+      "&lt;JJ/MM/AAAA  HH:MM&gt;": "TODAY_DATETIME",
+      "&lt;Nom Prénom — Fonction&gt;": "form_data.detected_by || form_data.assigned_to",
+      "&lt;Donner un titre court et descriptif à l'anomalie&gt;": "form_data.title",
+      "&lt;Décrivez ce qui aurait dû se passer selon la spécification de référence&gt;": "mistral.expected_result_gxp || form_data.expected_result",
+      "&lt;Décrivez précisément ce qui s'est réellement passé&gt;": "mistral.obtained_result_gxp || form_data.obtained_result",
+      "&lt;Première hypothèse sur la cause racine — à valider lors de l'investigation&gt;": "mistral.root_cause_analysis || form_data.root_cause_hypothesis",
+      "&lt;Pourquoi cette anomalie peut être considérée comme clôturée&gt;": "mistral.closure_criteria",
+      "&lt;Référence Veeva nouvelle anomalie si applicable&gt;": "''",
+      "&lt;Référence(s) doc mis à jour — ex: BLK-IFS-001 v2.0&gt;": "''",
+      "Date : JJ/MM/AAAA": "Date : TODAY_DATE"
+    },
+
+    "sequential_replacements": {
+      "&lt;JJ/MM/AAAA&gt;": [
+        "TODAY_DATE",
+        "mistral.actions_plan[0].delai || form_data.target_date",
+        "mistral.actions_plan[1].delai || form_data.target_date",
+        "mistral.actions_plan[2].delai || form_data.target_date",
+        "form_data.target_date"
+      ],
+      "&lt;Nom Prénom&gt;": [
+        "form_data.assigned_to"
+      ],
+      "&lt;À compléter&gt;": [
+        "form_data.assigned_to",
+        "form_data.approver || form_data.assigned_to",
+        "mistral.steps_enriched[0].action || form_data.step_1",
+        "mistral.steps_enriched[1].action || form_data.step_2",
+        "mistral.steps_enriched[2].action || form_data.step_3",
+        "mistral.steps_enriched[3].action || form_data.step_4",
+        "mistral.steps_enriched[4].action || form_data.step_5"
+      ],
+      "&lt;Décrivez l'action à mener&gt;": [
+        "mistral.actions_plan[0].action || form_data.action_plan",
+        "mistral.actions_plan[1].action || form_data.action_plan",
+        "mistral.actions_plan[2].action"
+      ],
+      "&lt;Nom / Équipe&gt;": [
+        "mistral.actions_plan[0].responsable || form_data.assigned_to",
+        "mistral.actions_plan[1].responsable || form_data.assigned_to",
+        "mistral.actions_plan[2].responsable || form_data.assigned_to"
+      ]
+    },
+
+    "checkboxes": {
+      "priority": {
+        "options": ["Critical", "High", "Medium", "Low"],
+        "field": "form_data.priority"
+      },
+      "status": {
+        "options": ["Open", "In Progress", "Closed"],
+        "field": "form_data.status",
+        "default": "Open"
+      }
+    }
+  },
+
+  "urs_v1": {
+    "doc_ref_pattern": "Référence : BLK-URS-XXXX",
+    "doc_ref_value": "Référence : {form_data.doc_ref || 'BLK-URS-' + request_id}",
+
+    "simple_replacements": {
+      "&lt;Nom complet du système&gt;": "form_data.system_name",
+      "&lt;Nom du site de déploiement&gt;": "form_data.site_name",
+      "&lt;Description du besoin métier — pourquoi ce système est nécessaire&gt;": "mistral.system_description || form_data.description",
+      "&lt;Équipes impliquées — Production, Qualité, IT, etc.&gt;": "form_data.stakeholders",
+      "&lt;Nom du système cible&gt;": "form_data.system_name",
+      "Date : JJ/MM/AAAA": "Date : TODAY_DATE"
+    },
+
+    "sequential_replacements": {
+      "&lt;JJ/MM/AAAA&gt;": ["TODAY_DATE"],
+      "&lt;Nom Prénom&gt;": ["form_data.assigned_to"],
+      "&lt;À compléter&gt;": [
+        "form_data.assigned_to",
+        "form_data.approver || form_data.assigned_to",
+        "N/A",
+        "N/A",
+        "N/A",
+        "mistral.glossary[0].term || ''",
+        "mistral.glossary[0].definition || ''"
+      ],
+      "&lt;ID&gt;": [
+        "mistral.requirements[0].id || 'REQ-001'",
+        "mistral.requirements[1].id || 'REQ-002'",
+        "mistral.interfaces[0].system || ''",
+        "mistral.records[0].id || 'REC-001'"
+      ],
+      "&lt;Décrivez l'exigence de façon précise et vérifiable&gt;": [
+        "mistral.requirements[0].description || form_data.description"
+      ],
+      "&lt;M/D/O&gt;": ["mistral.requirements[0].priority || 'M'"],
+      "&lt;GxP/HSE/OP&gt;": ["mistral.requirements[0].classification || 'GxP'"],
+      "&lt;Décrivez l'exigence&gt;": [
+        "mistral.requirements[1].description || ''",
+        "mistral.requirements[2].description || ''"
+      ],
+      "&lt;Nom équipement ou système&gt;": [
+        "form_data.source_system || ''",
+        "''",
+        "''"
+      ],
+      "&lt;OPC-UA / ODBC / Fichier plat / API&gt;": [
+        "form_data.connection_type || 'OPC-UA'",
+        "''",
+        "''"
+      ],
+      "&lt;Système cible&gt;": ["mistral.interfaces[0].system || ''"],
+      "&lt;Description de l'interface&gt;": ["mistral.interfaces[0].description || ''"]
+    },
+
+    "checkboxes": {
+      "oui_non_gxp": {
+        "options": ["OUI", "NON"],
+        "field": "form_data.gxp_required",
+        "default": "OUI"
+      }
+    }
+  },
+
+  "interface_spec_v1": {
+    "doc_ref_pattern": "Référence : BLK-IFS-XXXX",
+    "doc_ref_value": "Référence : {form_data.doc_ref || 'BLK-IFS-' + request_id}",
+
+    "simple_replacements": {
+      "&lt;Domaine de l'équipement — ex: Zone de production, Utilities&gt;": "form_data.domain || form_data.description",
+      "&lt;Classe générique de l'équipement&gt;": "form_data.equipment_class || ''",
+      "&lt;Description courte de l'équipement et de son rôle&gt;": "form_data.description || mistral.objective",
+      "&lt;Nom ou adresse du serveur OPC-UA&gt;": "mistral.opc_server || form_data.opc_server",
+      "&lt;À préciser selon politique de sécurité du site&gt;": "mistral.auth_method || 'Anonymous / Username-Password'",
+      "&lt;Politique de validation des certificats&gt;": "form_data.cert_policy || 'Trust on first use (TOFU)'",
+      "&lt;Base de données / Fichier plat / API&gt;": "mistral.audit_trail_source || ''",
+      "&lt;Méthode technique d'extraction&gt;": "''",
+      "&lt;Temps réel / Périodique — préciser&gt;": "form_data.sync_frequency || 'Temps réel'",
+      "&lt;Décrire comment l'Audit Trail est stocké&gt;": "''",
+      "&lt;Nom et version du système MES&gt;": "form_data.mes_system || ''",
+      "&lt;Liste des tags / paramètres échangés avec le MES&gt;": "''",
+      "&lt;Structure de données attendue par le MES — unités, alias, calculs&gt;": "''",
+      "&lt;Détailler les calculs configurés pour l'interface&gt;": "''",
+      "&lt;Convention de nommage des équipements dans les événements&gt;": "form_data.naming_convention || ''",
+      "&lt;Champs obligatoires dans l'en-tête de chaque événement&gt;": "''",
+      "&lt;Intervalle d'exécution de la requête — ex: toutes les 30 secondes&gt;": "form_data.sync_frequency || '30 secondes'",
+      "Date : JJ/MM/AAAA": "Date : TODAY_DATE"
+    },
+
+    "sequential_replacements": {
+      "&lt;JJ/MM/AAAA&gt;": ["TODAY_DATE"],
+      "&lt;Nom Prénom&gt;": ["form_data.assigned_to"],
+      "&lt;À compléter&gt;": [
+        "form_data.assigned_to",
+        "form_data.approver || form_data.assigned_to",
+        "N/A",
+        "N/A",
+        "N/A",
+        "form_data.db_type || ''",
+        "form_data.db_server || ''",
+        "form_data.db_name || ''",
+        "form_data.db_driver || ''"
+      ],
+      "&lt;Identifiant système&gt;": [
+        "mistral.systems[0].id || 'SYS-001'",
+        "mistral.systems[1].id || 'SYS-002'"
+      ],
+      "&lt;Nom du device ou serveur&gt;": [
+        "mistral.systems[0].name || form_data.source_system || ''",
+        "mistral.systems[1].name || ''"
+      ],
+      "&lt;x.x.x.x&gt;": [
+        "mistral.systems[0].ip || ''",
+        "mistral.systems[1].ip || ''"
+      ],
+      "&lt;Description&gt;": [
+        "mistral.systems[0].description || ''",
+        "mistral.systems[1].description || ''"
+      ],
+      "&lt;Nom tag cible&gt;": [
+        "mistral.tags[0].name || 'TAG_001'",
+        "mistral.tags[1].name || 'TAG_002'",
+        "mistral.tags[2].name || 'TAG_003'"
+      ],
+      "&lt;Chemin OPC source&gt;": [
+        "mistral.tags[0].opc_path || ''",
+        "mistral.tags[1].opc_path || ''",
+        "mistral.tags[2].opc_path || ''"
+      ],
+      "&lt;Unité&gt;": [
+        "mistral.tags[0].unit || '°C'",
+        "mistral.tags[1].unit || 'bar'",
+        "mistral.tags[2].unit || 'L/h'"
+      ],
+      "&lt;x sec&gt;": [
+        "mistral.tags[0].frequency || '10s'",
+        "mistral.tags[1].frequency || '10s'",
+        "mistral.tags[2].frequency || '30s'"
+      ],
+      "&lt;Type alarme — paramètre critique&gt;": ["form_data.alarm_critical || ''"],
+      "&lt;Type alarme — paramètre non critique&gt;": ["form_data.alarm_noncritical || ''"],
+      "&lt;Type alarme maintenance&gt;": ["form_data.alarm_maintenance || ''"],
+      "&lt;À compléter&gt;": ["''","''","''","''","''"]
+    },
+
+    "checkboxes": {
+      "audit_trail": {
+        "options": ["OUI — GxP critique", "OUI — Non GxP", "Non applicable"],
+        "field": "form_data.audit_trail",
+        "default": "OUI — GxP critique"
+      },
+      "mes": {
+        "options": ["OUI", "Non applicable"],
+        "field": "form_data.mes_required",
+        "default": "Non applicable"
+      }
+    }
+  },
+
+  "dira_pdfm_v1": {
+    "doc_ref_pattern": "Référence : BLK-DIRA-XXXX",
+    "doc_ref_value": "Référence : {form_data.doc_ref || 'BLK-DIRA-' + request_id}",
+
+    "simple_replacements": {
+      "&lt;Nom du processus métier faisant l'objet de cette analyse&gt;": "form_data.process_name || form_data.system_name",
+      "&lt;Nom du site&gt;": "form_data.site_name || ''",
+      "&lt;Référence de la SOP DIRA utilisée&gt;": "mistral.sop_ref || form_data.sop_ref || 'SOP-DIRA-001'",
+      "&lt;Listez les sous-processus et activités inclus dans l'analyse PDFM/DIRA&gt;": "mistral.scope_in || form_data.scope_in",
+      "&lt;Listez explicitement ce qui est exclu de l'analyse et justifiez chaque exclusion&gt;": "mistral.scope_out || form_data.scope_out",
+      "&lt;Rédigez la conclusion : tous les risques DI ont-ils été traités ? Tous les risques résiduels sont-ils à un niveau acceptable ? Quel est le statut final ?&gt;": "mistral.conclusion",
+      "Date : JJ/MM/AAAA": "Date : TODAY_DATE"
+    },
+
+    "sequential_replacements": {
+      "&lt;JJ/MM/AAAA&gt;": [
+        "TODAY_DATE",
+        "mistral.actions[0].deadline || form_data.target_date",
+        "mistral.actions[1].deadline || form_data.target_date"
+      ],
+      "&lt;Nom Prénom&gt;": [
+        "form_data.assigned_to",
+        "form_data.assigned_to",
+        "form_data.assigned_to",
+        "form_data.assigned_to",
+        "form_data.assigned_to"
+      ],
+      "&lt;À compléter&gt;": [
+        "form_data.assigned_to",
+        "form_data.approver || form_data.assigned_to",
+        "N/A",
+        "N/A",
+        "N/A",
+        "form_data.assigned_to",
+        "form_data.assigned_to"
+      ],
+      "&lt;Système 1&gt;": ["mistral.systems[0].name || form_data.system_name || ''"],
+      "&lt;Processus principal supporté&gt;": ["mistral.systems[0].process || form_data.process_name || ''"],
+      "&lt;Système 2&gt;": ["mistral.systems[1].name || ''"],
+      "&lt;Processus secondaire supporté&gt;": ["mistral.systems[1].process || ''"],
+      "&lt;Nom sous-processus&gt;": [
+        "mistral.risks[0].subprocess || ''",
+        "mistral.risks[1].subprocess || ''",
+        "mistral.risks[2].subprocess || ''"
+      ],
+      "&lt;Systèmes source et cible&gt;": ["''","''","''"],
+      "&lt;Type et nature des données échangées&gt;": ["''","''","''"],
+      "&lt;Contrôles ALCOA+ en place ou manquants&gt;": ["''","''","''"],
+      "&lt;Sous-processus&gt;": [
+        "mistral.risks[0].subprocess || ''",
+        "mistral.risks[1].subprocess || ''",
+        "mistral.risks[2].subprocess || ''",
+        "mistral.risks[3].subprocess || ''"
+      ],
+      "&lt;Décrivez le risque identifié&gt;": ["mistral.risks[3].description || ''"],
+      "&lt;1-3&gt;": [
+        "mistral.risks[3].severity || '1'",
+        "mistral.risks[3].frequency || '1'",
+        "mistral.risks[3].detectability || '1'"
+      ],
+      "&lt;RPN&gt;": ["mistral.risks[3].rpn || '1'"],
+      "&lt;Action de mitigation proposée&gt;": ["mistral.risks[3].mitigation || ''"],
+      "&lt;Détail de l'action corrective à mener&gt;": [
+        "mistral.actions[0].action || ''",
+        "mistral.actions[1].action || ''"
+      ],
+      "&lt;Nom / Équipe&gt;": [
+        "mistral.actions[0].owner || form_data.assigned_to",
+        "mistral.actions[1].owner || form_data.assigned_to"
+      ],
+      "&lt;X&gt;": [
+        "mistral.risks_before_l1 || '1'",
+        "mistral.risks_before_l2 || '3'",
+        "mistral.risks_before_l3 || '1'",
+        "mistral.risks_after_l1 || '4'",
+        "mistral.risks_after_l2 || '1'",
+        "mistral.risks_after_l3 || '0'"
+      ],
+      "&lt;&gt;": ["''","''","''"]
+    },
+
+    "checkboxes": {
+      "criticality": {
+        "options": ["Critical", "Major"],
+        "field": "form_data.system_criticality",
+        "default": "Critical"
+      },
+      "actor_roles": {
+        "options": ["OUI", "NON"],
+        "field": "form_data.actors_confirmed",
+        "default": "OUI"
+      }
+    }
+  }
+}
